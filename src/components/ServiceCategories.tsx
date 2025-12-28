@@ -1,4 +1,4 @@
-import { Dog, Leaf, Wrench, GraduationCap, Car, Sparkles, Baby, ShoppingBag, Scissors, Sofa, Music, Heart, HeartHandshake } from "lucide-react";
+import { Dog, Leaf, Wrench, GraduationCap, Car, Sparkles, Baby, ShoppingBag, Scissors, Sofa, Music, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const categories = [
@@ -14,7 +14,6 @@ const categories = [
   { icon: ShoppingBag, label: "Delivery", color: "bg-primary/10 text-primary" },
   { icon: Music, label: "Music Lessons", color: "bg-neighborhood/10 text-neighborhood" },
   { icon: Heart, label: "Life Coaching", color: "bg-secondary text-secondary-foreground" },
-  { icon: HeartHandshake, label: "Recovery", color: "bg-accent/50 text-accent-foreground" },
 ];
 
 const ServiceCategories = () => {
