@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, User, Phone, FileText, Briefcase, Loader2, LogOut, MapPin } from "lucide-react";
 import { z } from "zod";
+import MyServices from "@/components/MyServices";
 
 const profileSchema = z.object({
   full_name: z.string().trim().max(100, "Name must be less than 100 characters").optional(),
@@ -298,19 +299,16 @@ const Profile = () => {
           </div>
 
           {formData.is_service_provider && (
-            <div className="p-4 rounded-xl bg-secondary/50 border border-secondary">
-              <p className="text-sm text-secondary-foreground">
-                As a service provider, you can list your services and get hired by neighbors.
-              </p>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="mt-3"
-                onClick={() => navigate("/add-service")}
-              >
-                Add a Service
-              </Button>
-            </div>
+            <>
+              <div className="p-4 rounded-xl bg-secondary/50 border border-secondary">
+                <p className="text-sm text-secondary-foreground">
+                  As a service provider, you can list your services and get hired by neighbors.
+                </p>
+              </div>
+              
+              {/* My Services Section */}
+              <MyServices userId={user.id} />
+            </>
           )}
         </div>
 
