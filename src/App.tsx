@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import PostJob from "./pages/PostJob";
 import AddService from "./pages/AddService";
+import EditService from "./pages/EditService";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/post-job" element={<PostJob />} />
             <Route path="/add-service" element={<AddService />} />
+            <Route path="/edit-service/:id" element={<EditService />} />
             <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
