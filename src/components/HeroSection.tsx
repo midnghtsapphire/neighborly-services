@@ -1,4 +1,6 @@
-import { Search } from "lucide-react";
+import { Search, Plus, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
   return (
@@ -37,6 +39,22 @@ const HeroSection = () => {
               {tag}
             </button>
           ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 mt-6">
+          <Button asChild variant="secondary" className="flex-1 h-11 rounded-xl font-medium">
+            <Link to="/post-job">
+              <Plus className="w-4 h-4 mr-2" />
+              Post a Job
+            </Link>
+          </Button>
+          <Button asChild className="flex-1 h-11 rounded-xl font-medium bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+            <Link to="/add-service">
+              <Sparkles className="w-4 h-4 mr-2" />
+              List a Service
+            </Link>
+          </Button>
         </div>
       </div>
     </section>
