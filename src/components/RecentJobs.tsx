@@ -1,14 +1,44 @@
+import { useEffect, useState } from "react";
 import { Briefcase, Plus, Clock, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
+import { formatDistanceToNow } from "date-fns";
+
+const categoryLabels: Record<string, string> = {
+  pet_care: "Pet Care",
+  lawn_garden: "Lawn & Garden",
+  handyman: "Handyman",
+  tutoring: "Tutoring",
+  errands: "Errands",
+  cleaning: "Cleaning",
+  babysitting: "Babysitting",
+  delivery: "Delivery",
+  other: "Other",
+};
+
+interface Job {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string;
+  budget: number | null;
+  is_urgent: boolean | null;
+  location: string | null;
+  created_at: string;
+  poster_id: string;
+  profiles: {
+    full_name: string | null;
+  } | null;
+}
 
 interface JobCardProps {
   title: string;
   description: string;
   budget: string;
-  postedBy: string;
   timeAgo: string;
-  distance: string;
+  location: string;
   category: string;
   urgent?: boolean;
 }
@@ -17,9 +47,8 @@ const JobCard = ({
   title,
   description,
   budget,
-  postedBy,
   timeAgo,
-  distance,
+  location,
   category,
   urgent = false,
 }: JobCardProps) => {
@@ -43,10 +72,12 @@ const JobCard = ({
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
         <div className="flex items-center gap-3">
           <Badge variant="secondary" className="text-[10px]">{category}</Badge>
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <MapPin className="w-3 h-3" />
-            <span className="text-xs">{distance}</span>
-          </div>
+          {location && (
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <MapPin className="w-3 h-3" />
+              <span className="text-xs">{location}</span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-1 text-muted-foreground">
           <Clock className="w-3 h-3" />
@@ -57,39 +88,75 @@ const JobCard = ({
   );
 };
 
-const mockJobs: JobCardProps[] = [
-  {
-    title: "Need help moving furniture",
-    description: "Looking for someone to help move a couch and dresser from 2nd floor to ground level.",
-    budget: "$50",
-    postedBy: "Mike S.",
-    timeAgo: "2h ago",
-    distance: "0.2 mi",
-    category: "Moving",
-    urgent: true,
-  },
-  {
-    title: "Weekly dog walking",
-    description: "Need someone to walk my golden retriever Mon-Fri around 12pm. He's very friendly!",
-    budget: "$15/walk",
-    postedBy: "Lisa K.",
-    timeAgo: "5h ago",
-    distance: "0.4 mi",
-    category: "Pet Care",
-  },
-  {
-    title: "Backyard cleanup",
-    description: "Leaves need raking and some basic trimming. Approximately 2-3 hours of work.",
-    budget: "$75",
-    postedBy: "Tom R.",
-    timeAgo: "1d ago",
-    distance: "0.6 mi",
-    category: "Lawn",
-  },
-];
+const JobCardSkeleton = () => (
+  <div className="p-4 rounded-2xl bg-card border border-border">
+    <div className="flex items-start justify-between gap-3 mb-2">
+      <div className="flex-1 space-y-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-full" />
+      </div>
+      <Skeleton className="h-4 w-12" />
+    </div>
+    <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+      <Skeleton className="h-5 w-16" />
+      <Skeleton className="h-3 w-12" />
+    </div>
+  </div>
+);
+
+const EmptyState = () => (
+  <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
+    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+      <Briefcase className="w-6 h-6 text-muted-foreground" />
+    </div>
+    <p className="text-sm text-muted-foreground">No jobs posted yet</p>
+    <p className="text-xs text-muted-foreground mt-1">Be the first to post a job!</p>
+  </div>
+);
 
 const RecentJobs = () => {
   const navigate = useNavigate();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("jobs")
+          .select(`
+            id,
+            title,
+            description,
+            category,
+            budget,
+            is_urgent,
+            location,
+            created_at,
+            poster_id,
+            profiles!jobs_poster_id_fkey (
+              full_name
+            )
+          `)
+          .eq("status", "open")
+          .order("created_at", { ascending: false })
+          .limit(5);
+
+        if (error) throw error;
+
+        setJobs((data || []).map(job => ({
+          ...job,
+          profiles: job.profiles as Job["profiles"]
+        })));
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   return (
     <section className="px-4 py-6">
@@ -101,11 +168,30 @@ const RecentJobs = () => {
         <button className="text-sm text-primary font-medium hover:underline">See all</button>
       </div>
 
-      <div className="space-y-3">
-        {mockJobs.map((job, index) => (
-          <JobCard key={index} {...job} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <JobCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : jobs.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="space-y-3">
+          {jobs.map((job) => (
+            <JobCard
+              key={job.id}
+              title={job.title}
+              description={job.description || "No description provided"}
+              budget={job.budget ? `$${job.budget}` : "Flexible"}
+              timeAgo={formatDistanceToNow(new Date(job.created_at), { addSuffix: true })}
+              location={job.location || ""}
+              category={categoryLabels[job.category] || job.category}
+              urgent={job.is_urgent || false}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Post a Job CTA */}
       <button 
