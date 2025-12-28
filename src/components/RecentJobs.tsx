@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import { Briefcase, Plus, Clock, MapPin } from "lucide-react";
+import { Briefcase, Plus, Clock, MapPin, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
+import { useAuth } from "@/contexts/AuthContext";
+import { useMessaging } from "@/hooks/useMessaging";
+import { useToast } from "@/hooks/use-toast";
 
 const categoryLabels: Record<string, string> = {
   pet_care: "Pet Care",
@@ -41,6 +45,9 @@ interface JobCardProps {
   location: string;
   category: string;
   urgent?: boolean;
+  posterId: string;
+  onMessage: (posterId: string) => void;
+  isOwnJob: boolean;
 }
 
 const JobCard = ({
@@ -51,9 +58,12 @@ const JobCard = ({
   location,
   category,
   urgent = false,
+  posterId,
+  onMessage,
+  isOwnJob,
 }: JobCardProps) => {
   return (
-    <div className="p-4 rounded-2xl bg-card border border-border hover:shadow-warm-md transition-all duration-200 cursor-pointer">
+    <div className="p-4 rounded-2xl bg-card border border-border hover:shadow-warm-md transition-all duration-200">
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
@@ -79,9 +89,24 @@ const JobCard = ({
             </div>
           )}
         </div>
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <Clock className="w-3 h-3" />
-          <span className="text-xs">{timeAgo}</span>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Clock className="w-3 h-3" />
+            <span className="text-xs">{timeAgo}</span>
+          </div>
+          {!isOwnJob && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMessage(posterId);
+              }}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+            </Button>
+          )}
         </div>
       </div>
     </div>
@@ -116,8 +141,29 @@ const EmptyState = () => (
 
 const RecentJobs = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { findOrCreateConversation } = useMessaging();
+  const { toast } = useToast();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleMessage = async (posterId: string) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    const conversationId = await findOrCreateConversation(posterId);
+    if (conversationId) {
+      navigate(`/chat/${conversationId}`);
+    } else {
+      toast({
+        title: "Error",
+        description: "Could not start conversation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -188,6 +234,9 @@ const RecentJobs = () => {
               location={job.location || ""}
               category={categoryLabels[job.category] || job.category}
               urgent={job.is_urgent || false}
+              posterId={job.poster_id}
+              onMessage={handleMessage}
+              isOwnJob={user?.id === job.poster_id}
             />
           ))}
         </div>

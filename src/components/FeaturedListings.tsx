@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
-import { Star, MapPin, Clock, Users } from "lucide-react";
+import { Star, MapPin, Clock, Users, MessageSquare } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
+import { useMessaging } from "@/hooks/useMessaging";
+import { useToast } from "@/hooks/use-toast";
 
 const categoryLabels: Record<string, string> = {
   pet_care: "Pet Care",
@@ -41,6 +46,9 @@ interface ServiceCardProps {
   rating: number;
   reviews: number;
   price: string;
+  providerId: string;
+  onMessage: (providerId: string) => void;
+  isOwnService: boolean;
 }
 
 const ServiceCard = ({
@@ -51,9 +59,12 @@ const ServiceCard = ({
   rating,
   reviews,
   price,
+  providerId,
+  onMessage,
+  isOwnService,
 }: ServiceCardProps) => {
   return (
-    <div className="min-w-[280px] p-4 rounded-2xl bg-card shadow-warm-sm hover:shadow-warm-md transition-all duration-200 cursor-pointer group">
+    <div className="min-w-[280px] p-4 rounded-2xl bg-card shadow-warm-sm hover:shadow-warm-md transition-all duration-200 group">
       <div className="flex gap-3">
         <div className="relative">
           <Avatar className="w-14 h-14 ring-2 ring-border">
@@ -83,9 +94,25 @@ const ServiceCard = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1 mt-2 text-success">
-            <Clock className="w-3 h-3" />
-            <span className="text-xs font-medium">Available</span>
+          <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center gap-1 text-success">
+              <Clock className="w-3 h-3" />
+              <span className="text-xs font-medium">Available</span>
+            </div>
+            {!isOwnService && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMessage(providerId);
+                }}
+              >
+                <MessageSquare className="w-3.5 h-3.5 mr-1" />
+                <span className="text-xs">Message</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -117,8 +144,30 @@ const EmptyState = () => (
 );
 
 const FeaturedListings = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { findOrCreateConversation } = useMessaging();
+  const { toast } = useToast();
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleMessage = async (providerId: string) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    const conversationId = await findOrCreateConversation(providerId);
+    if (conversationId) {
+      navigate(`/chat/${conversationId}`);
+    } else {
+      toast({
+        title: "Error",
+        description: "Could not start conversation. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -213,6 +262,9 @@ const FeaturedListings = () => {
               rating={service.review_stats.avg_rating}
               reviews={service.review_stats.review_count}
               price={service.hourly_rate ? `$${service.hourly_rate}/hr` : "Contact"}
+              providerId={service.provider_id}
+              onMessage={handleMessage}
+              isOwnService={user?.id === service.provider_id}
             />
           ))}
         </div>
