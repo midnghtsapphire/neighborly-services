@@ -1,4 +1,4 @@
-import { Dog, Leaf, Wrench, GraduationCap, Car, Sparkles, Baby, ShoppingBag } from "lucide-react";
+import { Dog, Leaf, Wrench, GraduationCap, Car, Sparkles, Baby, ShoppingBag, Scissors, Sofa } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const categories = [
@@ -6,10 +6,10 @@ const categories = [
   { icon: Leaf, label: "Lawn & Garden", color: "bg-success/10 text-success" },
   { icon: Wrench, label: "Handyman", color: "bg-primary/10 text-primary" },
   { icon: GraduationCap, label: "Tutoring", color: "bg-neighborhood/10 text-neighborhood" },
-  { icon: Car, label: "Errands", color: "bg-accent/50 text-accent-foreground" },
+  { icon: Scissors, label: "Sewing", color: "bg-accent/50 text-accent-foreground" },
+  { icon: Sofa, label: "Upholstery", color: "bg-neighborhood/10 text-neighborhood" },
   { icon: Sparkles, label: "Cleaning", color: "bg-secondary text-secondary-foreground" },
   { icon: Baby, label: "Babysitting", color: "bg-primary/10 text-primary" },
-  { icon: ShoppingBag, label: "Delivery", color: "bg-success/10 text-success" },
 ];
 
 const ServiceCategories = () => {
