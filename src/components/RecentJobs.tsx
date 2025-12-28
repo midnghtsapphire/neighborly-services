@@ -1,4 +1,5 @@
 import { Briefcase, Plus, Clock, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 
 interface JobCardProps {
@@ -88,6 +89,8 @@ const mockJobs: JobCardProps[] = [
 ];
 
 const RecentJobs = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="px-4 py-6">
       <div className="flex items-center justify-between mb-4">
@@ -105,7 +108,10 @@ const RecentJobs = () => {
       </div>
 
       {/* Post a Job CTA */}
-      <button className="w-full mt-4 p-4 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 group">
+      <button 
+        onClick={() => navigate("/post-job")}
+        className="w-full mt-4 p-4 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 group"
+      >
         <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center group-hover:scale-105 transition-transform">
           <Plus className="w-4 h-4 text-primary-foreground" />
         </div>
