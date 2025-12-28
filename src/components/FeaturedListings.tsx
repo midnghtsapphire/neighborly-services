@@ -47,7 +47,9 @@ interface ServiceCardProps {
   reviews: number;
   price: string;
   providerId: string;
+  serviceId: string;
   onMessage: (providerId: string) => void;
+  onCardClick: (serviceId: string) => void;
   isOwnService: boolean;
 }
 
@@ -60,11 +62,16 @@ const ServiceCard = ({
   reviews,
   price,
   providerId,
+  serviceId,
   onMessage,
+  onCardClick,
   isOwnService,
 }: ServiceCardProps) => {
   return (
-    <div className="min-w-[280px] p-4 rounded-2xl bg-card shadow-warm-sm hover:shadow-warm-md transition-all duration-200 group">
+    <div 
+      className="min-w-[280px] p-4 rounded-2xl bg-card shadow-warm-sm hover:shadow-warm-md hover:border-primary/50 transition-all duration-200 group cursor-pointer border border-transparent"
+      onClick={() => onCardClick(serviceId)}
+    >
       <div className="flex gap-3">
         <div className="relative">
           <Avatar className="w-14 h-14 ring-2 ring-border">
@@ -263,7 +270,9 @@ const FeaturedListings = () => {
               reviews={service.review_stats.review_count}
               price={service.hourly_rate ? `$${service.hourly_rate}/hr` : "Contact"}
               providerId={service.provider_id}
+              serviceId={service.id}
               onMessage={handleMessage}
+              onCardClick={(id) => navigate(`/service/${id}`)}
               isOwnService={user?.id === service.provider_id}
             />
           ))}
