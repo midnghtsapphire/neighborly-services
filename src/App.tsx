@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import Chat from "./pages/Chat";
 import Services from "./pages/Services";
+import ServiceDetail from "./pages/ServiceDetail";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/messages" element={<Messages />} />
             <Route path="/chat/:id" element={<Chat />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/service/:id" element={<ServiceDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

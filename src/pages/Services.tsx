@@ -194,7 +194,8 @@ const Services = () => {
               return (
                 <div
                   key={service.id}
-                  className="p-4 rounded-2xl bg-card border border-border hover:shadow-warm-md transition-all"
+                  className="p-4 rounded-2xl bg-card border border-border hover:shadow-warm-md hover:border-primary/50 transition-all cursor-pointer"
+                  onClick={() => navigate(`/service/${service.id}`)}
                 >
                   <div className="flex gap-3">
                     <Avatar className="w-14 h-14 ring-2 ring-border">
