@@ -19,7 +19,8 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: "NeighborHub - Local Services Marketplace",
         short_name: "NeighborHub",
-        description: "Connect with neighbors for local services - dog walking, lawn care, handyman tasks & more",
+        description:
+          "Connect with neighbors for local services - dog walking, lawn care, handyman tasks & more",
         theme_color: "#E8652B",
         background_color: "#FBF9F7",
         display: "standalone",
@@ -54,5 +55,9 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  test: {
+    environment: "node",
+    include: ["src/**/*.{test,spec}.{ts,tsx}"],
   },
 }));

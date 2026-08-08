@@ -1,77 +1,101 @@
-# Welcome to your Lovable project
+# Neighborly Services (NeighborHub)
 
+Local neighborhood services marketplace — hire a neighbor for pet care, lawn & garden,
+handyman work, tutoring, cleaning, and more. Built with Vite, React, TypeScript,
+shadcn/ui, Tailwind CSS, and Supabase.
 
-<!-- AUTO-PACKAGE-BADGES:START -->
+## Live Deployment
 
-<!-- AUTO-PACKAGE-BADGES:END -->
-## Project info
+> Add the verified Vercel (or Lovable publish) URL here once the production host is
+> confirmed. Until then, run locally with the steps below.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- Browse service categories and nearby helper listings
+- Provider profiles with ratings and hourly rates
+- Auth (sign-up / sign-in) via Supabase
+- Messaging between neighbors and providers
+- Post jobs and offer services
+- Installable PWA (vite-plugin-pwa)
 
-There are several ways of editing your application.
+## Stack
 
-**Use Lovable**
+| Layer | Tech |
+| --- | --- |
+| UI | React 18, TypeScript, Tailwind, shadcn/ui |
+| Build | Vite 5 |
+| Data / Auth | Supabase (`@supabase/supabase-js`) |
+| State | TanStack Query, React Context |
+| CI jury | OpenRouter AI review, Jules, Semgrep, CodeQL |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Quick start
 
-Changes made via Lovable will be committed automatically to this repo.
+```bash
+# 1. Install
+npm install
 
-**Use your preferred IDE**
+# 2. Configure env (never commit real secrets)
+cp .env.example .env
+# edit .env with your Supabase project URL + anon/publishable key
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 3. Dev server (default http://localhost:8080)
 npm run dev
+
+# 4. Checks
+npm test
+npm run lint
+npm run typecheck
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## Scripts
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Vite dev server |
+| `npm test` | Vitest unit tests |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run build` | Production build → `dist/` |
+| `npm run check` | typecheck + lint + test |
 
-**Use GitHub Codespaces**
+## Environment
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+See [`.env.example`](./.env.example). Only the **public** Supabase URL and
+anon/publishable key belong in the frontend. Service-role keys must never ship
+in this repo or any client bundle.
 
-## What technologies are used for this project?
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `VITE_SUPABASE_URL` | yes (runtime) | Project URL |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | yes (runtime) | Anon / publishable key |
+| `VITE_SUPABASE_PROJECT_ID` | optional | Convenience id |
 
-This project is built with:
+## Project layout
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```text
+src/
+  components/     # UI + marketplace widgets
+  contexts/       # AuthProvider
+  hooks/          # messaging, mobile, toast
+  integrations/   # Supabase client + generated types
+  lib/            # pure helpers (categories, pricing, profile) + unit tests
+  pages/          # route screens
+supabase/         # migrations + config
+.github/workflows # CI + full review jury
+```
 
-## How can I deploy this project?
+## Contributing
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+See [CONTRIBUTING.md](./CONTRIBUTING.md). Overview and architecture notes live in
+[OVERVIEW.md](./OVERVIEW.md).
 
-## Can I connect a custom domain to my Lovable project?
+## Security
 
-Yes, you can!
+- `.env` is gitignored. A previously committed `.env` was removed in fleet maintenance.
+- Rotate any keys that were ever committed to git history.
+- Review jury on every non-draft PR: OpenRouter, Jules, Semgrep, CodeQL.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+See [LICENSE](./LICENSE).
