@@ -8,18 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessaging } from "@/hooks/useMessaging";
 import { useToast } from "@/hooks/use-toast";
+import { formatHourlyRate } from "@/lib/pricing";
+import { displayName, getInitials } from "@/lib/profile";
 
-const categoryLabels: Record<string, string> = {
-  pet_care: "Pet Care",
-  lawn_garden: "Lawn & Garden",
-  handyman: "Handyman",
-  tutoring: "Tutoring",
-  errands: "Errands",
-  cleaning: "Cleaning",
-  babysitting: "Babysitting",
-  delivery: "Delivery",
-  other: "Other",
-};
 
 interface Service {
   id: string;
@@ -232,15 +223,6 @@ const FeaturedListings = () => {
     fetchServices();
   }, []);
 
-  const getInitials = (name: string | null) => {
-    if (!name) return "??";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   return (
     <section className="py-6">
@@ -262,13 +244,13 @@ const FeaturedListings = () => {
           {services.map((service) => (
             <ServiceCard
               key={service.id}
-              name={service.profiles?.full_name || "Anonymous"}
+              name={displayName(service.profiles?.full_name, "Anonymous")}
               avatar={service.profiles?.avatar_url || ""}
               initials={getInitials(service.profiles?.full_name)}
               service={service.title}
               rating={service.review_stats.avg_rating}
               reviews={service.review_stats.review_count}
-              price={service.hourly_rate ? `$${service.hourly_rate}/hr` : "Contact"}
+              price={formatHourlyRate(service.hourly_rate)}
               providerId={service.provider_id}
               serviceId={service.id}
               onMessage={handleMessage}
